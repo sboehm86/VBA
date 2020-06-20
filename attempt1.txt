@@ -1,0 +1,48 @@
+Sub vba_homework()
+
+'set up variables
+Dim total As Double
+'variables for all worksheets
+Dim ws As Worksheet
+'i had to change this from integer to long because I kept getting a runtime error 6
+'running as long took a few minutes
+Dim j As Long
+
+For Each ws In Worksheets
+    'variables for each sheet
+    total = 0
+    j = 0
+    
+'set up last row
+'this took me forever and many trials and errors to get to work
+rowcount = Cells(Rows.Count, "A").End(xlUp).Row
+
+'set row titles and width
+ws.Range("I1").Value = "Ticker"
+    ws.Range("I:I").ColumnWidth = 12
+ws.Range("J1").Value = "Total Stock Volume"
+    ws.Range("J:J").ColumnWidth = 20
+ws.Range("H:H").ColumnWidth = 5
+    
+For i = 2 To rowcount
+
+'ticker change and paste result(if cell value changes)
+If ws.Cells(i + 1, 1).Value <> Cells(i, 1).Value Then
+    'ticker
+    ws.Range("I" & 2 + j).Value = Cells(i, 1).Value
+    'total
+    ws.Range("J" & 2 + j).Value = total
+    'reset total
+    total = 0
+    'next row
+    j = j + 1
+    
+    'add total volume per ticker symbol
+    Else
+        total = total + Cells(i, 7).Value
+    End If
+    
+Next i
+Next ws
+
+End Sub
