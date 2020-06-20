@@ -1,0 +1,89 @@
+Sub vba_wallstreet()
+
+'define variables
+Dim total As Double
+Dim i As Long
+Dim change As Single
+Dim j As Integer
+Dim start As Long
+Dim rowcount As Long
+Dim percentchange As Single
+
+'title rows and width adjustment
+Range("H:H").ColumnWidth = 5
+Range("I1").Value = "TICKER"
+    Range("I:I").ColumnWidth = 12
+Range("J1").Value = "YEARLY CHANGE"
+    Range("J:J").ColumnWidth = 15
+Range("K1").Value = "PERCENT CHANGE"
+    Range("K:K").ColumnWidth = 15
+Range("L1").Value = "TOTAL STOCK VOLUME"
+    Range("L:L").ColumnWidth = 20
+
+'starting values
+total = 0
+start = 2
+j = 0
+change = 0
+
+'last row formula
+rowcount = Cells(Rows.Count, "A").End(xlUp).Row
+
+'loopy
+For i = 2 To rowcount
+
+'if ticker value changes then paste result
+If Cells(i + 1, 1).Value <> Cells(i, 1).Value Then
+    total = total + Cells(i, 7).Value
+    If total = 0 Then
+    Range("I" & 2 + j).Value = Cells(i, 1).Value
+    Range("J" & 2 + j).Value = 0
+    Range("K" & 2 + j).Value = "%" & 0
+    Range("L" & 2 + j).Value = 0
+Else
+     If Cells(start, 3) = 0 Then
+        For find_value = start To i
+        If Cells(find_value, 3).Value <> 0 Then
+        start = find_value
+        Exit For
+        End If
+        Next find_value
+        End If
+                        
+    change = (Cells(i, 6) - Cells(start, 3))
+    percentchange = Round((change / Cells(start, 3) * 100), 2)
+    
+    'start of next ticker
+    start = i + 1
+    
+    'paste results
+    Range("I" & 2 + j).Value = Cells(i, 1).Value
+    Range("J" & 2 + j).Value = Round(change, 2)
+    Range("K" & 2 + j).Value = "%" & percentchange
+    Range("L" & 2 + j).Value = total
+    
+    'conditionally change colors
+    Select Case change
+    'simpler thatn if this than that
+    Case Is > 0
+        Range("J" & 2 + j).Interior.Color = vbGreen
+    Case Is < 0
+        Range("J" & 2 + j).Interior.Color = vbRed
+    Case Else
+        Range("J" & 2 + j).Interior.ColorIndex = 0
+    End Select
+    
+End If
+
+'reset variables for new ticker
+total = 0
+change = 0
+j = j + 1
+'if same add results
+Else
+    total = total + Cells(i, 7).Value
+End If
+
+Next i
+            
+End Sub
